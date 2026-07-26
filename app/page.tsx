@@ -2,7 +2,6 @@
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import Navbar from './components/Navbar';
-export const dynamic = 'force-dynamic';
 
 const Map = dynamic(() => import('./ProviderMap'), { ssr: false });
 
@@ -33,52 +32,41 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [specialtyFilter, setSpecialtyFilter] = useState('All');
   const [expandedId, setExpandedId] = useState<any>(null);
-  const [bookingId, setBookingId] = useState<any>(null);
-  const [isRegistering, setIsRegistering] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number]>([36.7783, -119.4179]);
+
   const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 3959; // Miles
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const R = 3959; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   };
+
   const handleSearch = (val: string) => {
     setSearchQuery(val);
     const found = ALL_PROVIDERS.find(p => p.zip === val);
-    
-    if (found) {
-      setMapCenter(found.position);
-    } else if (val.startsWith("90")) {
-      setMapCenter([34.0522, -118.2437]);
-    } else if (val.startsWith("94")) {
-      setMapCenter([37.7749, -122.4194]);
-    } else if (val.startsWith("92")) {
-      setMapCenter([32.7157, -117.1611]);
-    }
+    if (found) setMapCenter(found.position);
+    else if (val.startsWith("90")) setMapCenter([34.0522, -118.2437]);
+    else if (val.startsWith("94")) setMapCenter([37.7749, -122.4194]);
   };
-
 
   const filteredProviders = [...ALL_PROVIDERS]
   .filter(p => {
-    const isZipSearch = searchQuery.length === 5 && !isNaN(Number(searchQuery));
-    const matchesSearch = isZipSearch || searchQuery === '' || p.address.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = searchQuery === '' || p.address.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = specialtyFilter === 'All' || p.specialty === specialtyFilter;
     return matchesSearch && matchesSpecialty;
   })
   .sort((a, b) => {
     const found = ALL_PROVIDERS.find(p => p.zip === searchQuery);
     if (!found) return 0;
-    
     const distA = getDistance(found.position[0], found.position[1], a.position[0], a.position[1]);
     const distB = getDistance(found.position[0], found.position[1], b.position[0], b.position[1]);
     return distA - distB;
   });
 
-
   return (
     <main className="min-h-screen bg-gray-50">
-      <Navbar /> {/* Used your Navbar component */}
+      <Navbar />
       <div className="container mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
         <section className="space-y-4">
           <div className="bg-white p-4 rounded-xl border border-gray-200 flex gap-2">
@@ -100,7 +88,6 @@ export default function Home() {
                 {expandedId === p.id ? 'Hide Details' : 'View Profile'}
               </button>
               {expandedId === p.id && <div className="mt-2 text-sm italic text-gray-600">{p.bio}</div>}
-              <button onClick={() => setBookingId(p.id)} className="mt-4 w-full bg-[#0077B6] text-white py-2 rounded-lg font-bold">Book Appointment</button>
             </div>
           ))}
         </section>
