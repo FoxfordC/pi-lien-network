@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import Navbar from './components/Navbar';
+export const dynamic = 'force-dynamic';
 
 const Map = dynamic(() => import('./ProviderMap'), { ssr: false });
 
