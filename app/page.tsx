@@ -48,6 +48,7 @@ export default function Home() {
     if (found) setMapCenter(found.position);
     else if (val.startsWith("90")) setMapCenter([34.0522, -118.2437]);
     else if (val.startsWith("94")) setMapCenter([37.7749, -122.4194]);
+    else if (val.startsWith("92")) setMapCenter([32.7157, -117.1611]);
   };
 
   const filteredProviders = [...ALL_PROVIDERS]
